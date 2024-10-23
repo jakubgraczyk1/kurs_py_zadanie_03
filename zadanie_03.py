@@ -1,5 +1,7 @@
 import argparse
-
+import random
+import csv
+import os
 """
 Osoba 1: Jakub Graczyk
 Osoba 2: Hubert Szymański
@@ -55,21 +57,50 @@ def parse_arguments():
 
     return args
 
+def writefiles(paths):
+    for path in paths:
+        directory = os.path.dirname(path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        print(f"Writing file to {path}")
+        with open(path, mode='w', newline='') as file:
+            writer = csv.writer(file, delimiter=';')
+            writer.writerow(['Model', 'Wynik', 'Czas'])
+            model = random.choice(['A', 'B', 'C'])
+            score = random.randint(0, 1000)
+            time = f"{random.randint(0, 1000)}s"
+            writer.writerow([model, score, time])
+
+def readfiles(paths):
+    sum = 0
+    for path in paths:
+        if os.path.exists(path):
+            print(f"Reading file from {path}")
+            with open(path, mode='r', newline='') as file:
+                reader = csv.reader(file, delimiter=';')
+                next(reader)
+                for row in reader:
+                    if row[0] == 'A':
+                        sum += int(row[2][:-1])
+        else:
+            print(f"File does not exist: {path}")
+    print(f"Sum of times {sum}")
+    return sum
+
 args = parse_arguments()
 
 if args.operation == 'create':
     # Osoba 2
 
     # TODO
-    create_paths()
+    paths = create_paths()
     
-    # Osoba 3
-
-    # TODO
-    fill_files()
+    writefiles(paths)
 
 elif args.operation == 'read':
     # Osoba 2
 
     # TODO
-    read_paths()
+    paths = read_paths()
+
+    readfiles(paths)
