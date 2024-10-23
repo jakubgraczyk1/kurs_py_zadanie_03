@@ -7,7 +7,7 @@ from collections import OrderedDict
 Osoba 1: Jakub Graczyk
 Osoba 2: Hubert Szymański
 Osoba 3: Konrad Czarnecki
-EXAMPLE USE: -m "styczeń, luty" -d "pn-wt, śr-czw, czw" -o create -f csv
+EXAMPLE USE: -m "styczeń, luty" -d "pn-wt, śr-cz, cz" -o create -f csv
 """
 # Osoba 1 Jakub Graczyk
 ALLOWED_MONTHS = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", 
