@@ -59,7 +59,7 @@ def parse_arguments():
     return args
 
 def generate_paths(months, days, daytimes, file_type):
-    week_days = OrderedDict(pn = "poniedziałek", wt = "wtorek", sr = "środa", cz = "czwartek", pt = "piątek", sb = "sobota", nd = "niedziela")
+    week_days = OrderedDict([("pn", "poniedziałek"), ("wt", "wtorek"), ("śr", "środa"), ("cz", "czwartek"), ("pt", "piątek"), ("sb", "sobota"), ("nd", "niedziela")])
     number_of_days = 0
     paths = []
 
@@ -104,6 +104,7 @@ def generate_paths(months, days, daytimes, file_type):
                 paths[day] = os.path.join(paths[day], "rano", "Dane.json")
             else:
                 paths[day] = os.path.join(paths[day], daytimes[day], "Dane.json")
+    return paths
         
 
 def writefiles(paths):
