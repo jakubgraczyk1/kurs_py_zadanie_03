@@ -2,17 +2,18 @@ import argparse
 import random
 import csv
 import os
+from collections import OrderedDict
 """
 Osoba 1: Jakub Graczyk
 Osoba 2: Hubert Szymański
 Osoba 3: Konrad Czarnecki
-EXAMPLE USE: -m "styczeń, luty" -d "pn-wt, śr-czw, czw" -o create -f csv
+EXAMPLE USE: -m "styczeń, luty" -d "pn-wt, śr-cz, cz" -o create -f csv
 """
 # Osoba 1 Jakub Graczyk
 ALLOWED_MONTHS = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", 
                   "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]
 
-ALLOWED_DAYS = ["pn", "wt", "śr", "czw", "pt", "sb", "nd"]
+ALLOWED_DAYS = ["pn", "wt", "śr", "cz", "pt", "sb", "nd"]
 
 def validate_months(months):
     months_list = months.split(', ')
@@ -57,6 +58,54 @@ def parse_arguments():
 
     return args
 
+def generate_paths(months, days, daytimes, file_type):
+    week_days = OrderedDict(pn = "poniedziałek", wt = "wtorek", sr = "środa", cz = "czwartek", pt = "piątek", sb = "sobota", nd = "niedziela")
+    number_of_days = 0
+    paths = []
+
+    for i in range(len(daytimes)):
+        if daytimes[i] == "r":
+            daytimes[i] = "rano"
+        else:
+            daytimes[i] = "wieczór"
+
+    for i in range(len(months)):
+        if "-" in days[i]:
+            keys = list(week_days.keys())
+            start_day = days[i].split("-")[0]
+            end_day = days[i].split("-")[1]
+            start_idx = keys.index(start_day)
+            end_idx = keys.index(end_day)
+
+            if start_idx <= end_idx:
+                for j in range(start_idx, end_idx + 1):
+                    paths.append(os.path.join(os.getcwd(), months[i], week_days[keys[j]]))
+                    number_of_days += 1
+            else:
+                for j in range(start_idx, len(keys)):
+                    paths.append(os.path.join(os.getcwd(), months[i], week_days[keys[j]]))
+                    number_of_days += 1
+
+                for j in range(0, end_idx + 1):
+                    paths.append(os.path.join(os.getcwd(), months[i], week_days[keys[j]]))
+                    number_of_days += 1
+        else:
+            paths.append(os.path.join(os.getcwd(), months[i], week_days[days[i]]))
+            number_of_days += 1
+
+    for day in range(number_of_days):
+        if file_type == "csv":
+            if day >= len(daytimes):
+                paths[day] = os.path.join(paths[day], "rano", "Dane.csv")
+            else:
+                paths[day] = os.path.join(paths[day], daytimes[day], "Dane.csv")
+        else:
+            if day >= len(daytimes):
+                paths[day] = os.path.join(paths[day], "rano", "Dane.json")
+            else:
+                paths[day] = os.path.join(paths[day], daytimes[day], "Dane.json")
+        
+
 def writefiles(paths):
     for path in paths:
         directory = os.path.dirname(path)
@@ -89,18 +138,10 @@ def readfiles(paths):
 
 args = parse_arguments()
 
-if args.operation == 'create':
-    # Osoba 2
+paths = generate_paths(args.months, args.days, args.timeofday, args.format)
 
-    # TODO
-    paths = create_paths()
-    
+if args.operation == 'create':
     writefiles(paths)
 
 elif args.operation == 'read':
-    # Osoba 2
-
-    # TODO
-    paths = read_paths()
-
     readfiles(paths)
